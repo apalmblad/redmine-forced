@@ -1,10 +1,18 @@
 <h2>Forcer Settings</h2>
 
 <%
-queries = IssueQuery.find( :all,
-                    :select =>"queries.name, filters, projects.name AS project_name, queries.id",
-                    :joins => "LEFT OUTER JOIN projects ON projects.id = queries.project_id",
-                    :conditions => ['visibility IN ( ?)', [Query::VISIBILITY_PUBLIC, Query::VISIBILITY_ROLES]] )
+queries = []
+if Query.const_defined?( "VISIBILITY_PUBLIC" )
+  queries = IssueQuery.find( :all,
+                      :select =>"queries.name, filters, projects.name AS project_name, queries.id",
+                      :joins => "LEFT OUTER JOIN projects ON projects.id = queries.project_id",
+                      :conditions => ['visibility IN ( ?)', [Query::VISIBILITY_PUBLIC, Query::VISIBILITY_ROLES]] )
+else
+  queries = IssueQuery.find( :all,
+                      :select =>"queries.name, filters, projects.name AS project_name, queries.id",
+                      :joins => "LEFT OUTER JOIN projects ON projects.id = queries.project_id",
+                      :conditions => ['is_public=?', true] )
+end
 opts = []
 queries.select! do |x|
   is_good = false
