@@ -1,0 +1,94 @@
+<h2>Forcer Settings</h2>
+
+<%
+queries = IssueQuery.find( :all,
+                    :select =>"queries.name, filters, projects.name AS project_name, queries.id",
+                    :joins => "LEFT OUTER JOIN projects ON projects.id = queries.project_id",
+                    :conditions => ['visibility IN ( ?)', [Query::VISIBILITY_PUBLIC, Query::VISIBILITY_ROLES]] )
+opts = []
+queries.select! do |x|
+  is_good = false
+  x.filters.keys.each do |field|
+    if x.filters[field][:values]
+      x.filters[field][:values].each do |v|
+        if v == 'me'
+          is_good = true
+          break
+        end
+      end
+    else 
+      opts << x.filters[field][:values]
+    end
+    break if is_good
+  end
+  is_good
+end
+                      
+counter = 0
+-%>
+<% if queries.count.zero? -%>
+  <div class='error'>
+    <p>
+      There are no queries that are applicable at this moment.
+    </p>
+  </div>
+    
+<%else -%>
+  <% queries.map!{ |x| ["%s > %s" % [ x.project_name || 'Global', x.name], x.id] } -%>
+                    
+  <table id='forcer'>
+    <thead>
+      <tr>
+        <th>Issue Query</th>
+        <th>Maximum Issues</th>
+      </tr>
+    <tbody>
+      <% (settings['queries'] ? settings['queries'] : {}).values.each do |data| -%>
+        <tr>
+          <td><%= select_tag( "settings[queries][#{counter}][query_id]",
+              options_for_select( queries, data['query_id'].to_i ) ) -%>
+          </td>
+          <td>
+            <%= text_field_tag( "settings[queries][#{counter}][max_issues]", data['max_issues'], :maxlength => 5 ) -%>
+          </td>
+          <td>
+            <%= link_to "remove", "#", :class => 'remove' -%>
+          </td>
+          <% counter += 1 -%>
+        </tr>
+      <% end -%>
+      <% if counter.zero? -%>
+        <tr>
+          <td>
+            <%= select_tag( "settings[queries][#{counter}][query_id]",
+            options_for_select( [["", nil]] + queries, nil ) ) -%>
+          </td>
+          <td>
+            <%= text_field_tag( "settings[queries][#{counter}][max_issues]", '', :maxlength => 5 ) -%>
+          </td>
+          <td>
+            <%= link_to "remove", "#", :class => 'remove' -%>
+          </td>
+        </tr>
+      <%end -%>
+    </tbody>
+  </table>
+  <%= link_to( 'Add an Issue Query', '#', :id => 'add_row' ) -%>
+<% end -%>
+<script type='text/javascript'>
+//<!--[CDATA[
+  var QUERIES = <%= raw queries.to_json -%>;
+  var counter = <%= counter -%>;
+  function addQuery( e )
+  {
+    e.preventDefault();
+    counter++;
+    var row = $( "<tr>" + $('table#forcer tbody tr').first().html() + "</tr>" );
+    row.find( "select" ).attr( "name", "settings[query][" + counter + "][query_id]" );
+    row.find( "input" ).attr( "name", "settings[query][" + counter + "][max_issues]" );
+    $('table#forcer tbody').append( row );
+  }
+  $( 'a#add_row' ).click( addQuery );
+  $( 'table#forcer').on( 'click', 'a.remove', function(e){ $( e.target ).closest( 'tr' ).remove(); } );
+//]]>
+</script>
