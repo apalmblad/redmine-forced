@@ -51,13 +51,13 @@ counter = 0
         <th>Maximum Issues</th>
       </tr>
     <tbody>
-      <% (settings['queries'] ? settings['queries'] : {}).values.each do |data| -%>
+      <% (settings['query_ids'] || [] ).each_with_index do |query_id, i| -%>
         <tr>
-          <td><%= select_tag( "settings[queries][#{counter}][query_id]",
-              options_for_select( queries, data['query_id'].to_i ) ) -%>
+          <td><%= select_tag( "settings[query_ids][]",
+              options_for_select( queries, query_id.to_i ) ) -%>
           </td>
           <td>
-            <%= text_field_tag( "settings[queries][#{counter}][max_issues]", data['max_issues'], :maxlength => 5 ) -%>
+            <%= text_field_tag( "settings[max_issues][]", settings['max_issues'][i], :maxlength => 5 ) -%>
           </td>
           <td>
             <%= link_to "remove", "#", :class => 'remove' -%>
@@ -68,11 +68,11 @@ counter = 0
       <% if counter.zero? -%>
         <tr>
           <td>
-            <%= select_tag( "settings[queries][#{counter}][query_id]",
+            <%= select_tag( "settings[query_ids][]",
             options_for_select( [["", nil]] + queries, nil ) ) -%>
           </td>
           <td>
-            <%= text_field_tag( "settings[queries][#{counter}][max_issues]", '', :maxlength => 5 ) -%>
+            <%= text_field_tag( "settings[max_issues][]", '', :maxlength => 5 ) -%>
           </td>
           <td>
             <%= link_to "remove", "#", :class => 'remove' -%>
@@ -90,11 +90,9 @@ counter = 0
   function addQuery( e )
   {
     e.preventDefault();
-    counter++;
     var row = $( "<tr>" + $('table#forcer tbody tr').first().html() + "</tr>" );
-    row.find( "select" ).attr( "name", "settings[query][" + counter + "][query_id]" );
-    row.find( "input" ).attr( "name", "settings[query][" + counter + "][max_issues]" );
     $('table#forcer tbody').append( row );
+    counter++;
   }
   $( 'a#add_row' ).click( addQuery );
   $( 'table#forcer').on( 'click', 'a.remove', function(e){ $( e.target ).closest( 'tr' ).remove(); } );
