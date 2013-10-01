@@ -14,7 +14,7 @@ module ForcedIssue
   end
 
   def self.included( klass )
-    klass.send :before_save, :check_for_forced_query_limits
+    klass.send :before_create, :check_for_forced_query_limits
   end
 end
 module ForceIssueControllerChanges
