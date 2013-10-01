@@ -11,7 +11,7 @@ else
   queries = IssueQuery.find( :all,
                       :select =>"queries.name, filters, projects.name AS project_name, queries.id",
                       :joins => "LEFT OUTER JOIN projects ON projects.id = queries.project_id",
-                      :conditions => ['is_public=?', true] )
+                      :conditions => ['queries.is_public=?', true] )
 end
 opts = []
 queries.select! do |x|
