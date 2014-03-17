@@ -1,6 +1,6 @@
 = forced
 
-Do you follow Joel Spolsky's bug workflow?
+Do you follow [Joel Spolsky's bug workflow](http://www.joelonsoftware.com/articles/fog0000000029.html)
 Are bug reporters not fulfilling their side of the bargain?
 Are bugs being marked fixed and not being closed?
 
