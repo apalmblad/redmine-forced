@@ -1,6 +1,7 @@
 module ForcedIssue
   # -------------------------------------------- check_for_forced_query_limits
   def check_for_forced_query_limits
+    return true if Setting.plugin_forced['query_ids'].nil?
     Setting.plugin_forced['query_ids'].each_with_index do |query_id, i|
       query = IssueQuery.find( :first, :conditions => ["id=?",query_id] )
       next if query.project_id && query.project_id != project_id
@@ -19,6 +20,7 @@ module ForcedIssue
 end
 module ForceIssueControllerChanges
   def check_if_at_issue_limit
+    return true if Setting.plugin_forced['query_ids'].nil?
     Setting.plugin_forced['query_ids'].each_with_index do |query_id, i|
       query = IssueQuery.find( :first, :conditions => ["id=?",query_id] )
       next if query.project_id && query.project_id != project_id
