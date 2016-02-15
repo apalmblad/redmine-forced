@@ -1,10 +1,6 @@
 <h2>Forcer Settings</h2>
 
 <%
-    MAJOR = 3
-    MINOR = 2
-    TINY  = 0
-
 queries = if Redmine::VERSION::MAJOR >= 3
   IssueQuery.select( "queries.name, filters, projects.name AS project_name, queries.id" )
             .joins( "LEFT OUTER JOIN projects ON projects.id = queries.project_id" )
@@ -16,7 +12,7 @@ else
             .where( 'queries.is_public' => true )
 end
 opts = []
-queries.select! do |x|
+queries = queries.to_a.select do |x|
   is_good = false
   x.filters.keys.each do |field|
     if x.filters[field][:values]
