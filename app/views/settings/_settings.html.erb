@@ -1,11 +1,15 @@
 <h2>Forcer Settings</h2>
 
 <%
+    MAJOR = 3
+    MINOR = 2
+    TINY  = 0
 
-queries = if Query.const_defined?( "VISIBILITY_PUBLIC" )
+queries = if Redmine::VERSION::MAJOR >= 3
   IssueQuery.select( "queries.name, filters, projects.name AS project_name, queries.id" )
             .joins( "LEFT OUTER JOIN projects ON projects.id = queries.project_id" )
             .where( 'visibility IN ( ?)', [Query::VISIBILITY_PUBLIC, Query::VISIBILITY_ROLES] )
+
 else
   IssueQuery.select( "queries.name, filters, projects.name AS project_name, queries.id" )
             .joins( "LEFT OUTER JOIN projects ON projects.id = queries.project_id" )
